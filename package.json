@@ -1,5 +1,5 @@
 {
-  "name": "motion.js",
+  "name": "@motionlab/motionkit",
   "version": "0.1.0",
   "description": "FLIP card animations library for TypeScript and Vue 3",
   "type": "module",
