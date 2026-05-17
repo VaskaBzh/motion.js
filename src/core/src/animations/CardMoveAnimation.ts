@@ -1,5 +1,5 @@
 import { BaseAnimation } from './BaseAnimation.js';
-import type { CardMoveOptions, Trajectory } from '../types.js';
+import type { CardMoveOptions, Trajectory } from '../types';
 
 /**
  * Анимирует одну карточку по заранее вычисленной траектории (FLIP).
@@ -25,7 +25,7 @@ export class CardMoveAnimation extends BaseAnimation {
 		this.#options = { duration: 300, easing: 'ease', delay: 0, ...options };
 	}
 
-	override play(): Promise<void> {
+	public override play(): Promise<void> {
 		this.#nativeAnimation = this.#element.animate(
 			[
 				{ transform: `translate(${this.#deltaX}px, ${this.#deltaY}px)` },
@@ -42,7 +42,7 @@ export class CardMoveAnimation extends BaseAnimation {
 		return this.#nativeAnimation.finished.then(() => undefined);
 	}
 
-	override reverse(): Promise<void> {
+	public override reverse(): Promise<void> {
 		if (this.#nativeAnimation) {
 			this.#nativeAnimation.reverse();
 			return this.#nativeAnimation.finished.then(() => undefined);

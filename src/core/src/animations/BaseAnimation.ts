@@ -4,8 +4,8 @@
  */
 export abstract class BaseAnimation {
 	/** Запускает анимацию вперёд. Возвращает Promise, который резолвится по завершении. */
-	abstract play(): Promise<void>;
+	public abstract play(): Promise<void>;
 
 	/** Воспроизводит анимацию в обратном порядке. */
-	abstract reverse(): Promise<void>;
+	public abstract reverse(): Promise<void>;
 }

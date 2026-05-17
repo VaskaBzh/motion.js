@@ -100,7 +100,7 @@ async function shuffle(): Promise<void> {
 
   isAnimating.value = true;
   try {
-    await builder.buildMoveAnimation(cardEls.value ?? []).play();
+    await builder.buildAnimation(cardEls.value ?? []).play();
   } finally {
     isAnimating.value = false;
   }

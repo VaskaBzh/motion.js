@@ -1,21 +1,6 @@
-import { ref, type Ref } from 'vue';
-import { AnimationBuilder } from '../../core/src/index.js';
-import type { CardMoveOptions } from '../../core/src/index.js';
-
-/** Опции инициализации composable. */
-export interface CardAnimationComposableOptions extends CardMoveOptions {
-	stagger?: number;
-}
-
-/** Возвращаемый интерфейс composable. */
-export interface UseCardAnimationReturn {
-	/** Делает снимок позиций карточек до изменения DOM. */
-	snapshot: (cards: Iterable<HTMLElement>) => void;
-	/** Запускает анимацию движения карточек. Вызывать после изменения DOM. */
-	animateMove: (cards: Iterable<HTMLElement>) => Promise<void>;
-	/** Реактивный флаг: true пока идёт анимация. */
-	isAnimating: Ref<boolean>;
-}
+import { ref } from 'vue';
+import { AnimationBuilder } from '../../core/src';
+import type { CardAnimationComposableOptions, UseCardAnimationReturn } from '../types';
 
 /**
  * Vue composable для анимации движения карточек.
@@ -50,7 +35,7 @@ export function useCardAnimation(options: CardAnimationComposableOptions = {}): 
 	const animateMove = async (cards: Iterable<HTMLElement>): Promise<void> => {
 		isAnimating.value = true;
 		try {
-			const runner = builder.buildMoveAnimation(cards);
+			const runner = builder.buildAnimation(cards);
 			await runner.play();
 		} finally {
 			isAnimating.value = false;

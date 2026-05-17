@@ -1,4 +1,4 @@
-import type { Trajectory } from '../types.js';
+import type { Trajectory } from '../types';
 
 type Position = { x: number; y: number };
 
@@ -17,9 +17,8 @@ export class TrajectoryCalculator {
 	/**
 	 * Запоминает текущие позиции карточек (шаг First).
 	 * Вызывать до любого изменения DOM.
-	 * @param cards - Список карточек
 	 */
-	before(cards: Iterable<HTMLElement>): this {
+	public before(cards: Iterable<HTMLElement>): this {
 		this.#beforeSnapshot.clear();
 
 		for (const card of cards) {
@@ -33,10 +32,9 @@ export class TrajectoryCalculator {
 	/**
 	 * Вычисляет смещения карточек (шаг Invert).
 	 * Вызывать после изменения DOM.
-	 * @param cards - Тот же список карточек, что и в `before()`
 	 * @returns Массив траекторий только для карточек, которые сдвинулись
 	 */
-	calculate(cards: Iterable<HTMLElement>): Trajectory[] {
+	public calculate(cards: Iterable<HTMLElement>): Trajectory[] {
 		const trajectories: Trajectory[] = [];
 
 		for (const card of cards) {

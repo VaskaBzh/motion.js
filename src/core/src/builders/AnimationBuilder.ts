@@ -1,21 +1,24 @@
 import { TrajectoryCalculator } from '../trajectory/TrajectoryCalculator.js';
 import { CardMoveAnimation } from '../animations/CardMoveAnimation.js';
 import { AnimationRunner } from '../animations/AnimationRunner.js';
-import type { BuilderConfig } from '../types.js';
+import type { BuilderConfig, AnimationConstructor } from '../types';
 
 /**
  * Fluent builder для создания анимаций карточек.
  *
  * @example
  * ```ts
+ * import { CardMoveAnimation } from './animations/CardMoveAnimation.js';
+ *
  * const builder = new AnimationBuilder()
+ *   .use(CardMoveAnimation)
  *   .withDuration(350)
  *   .withEasing('cubic-bezier(0.4, 0, 0.2, 1)')
  *   .withStagger(30);
  *
  * builder.snapshot(cards);          // до изменения DOM
  * // ... изменяем DOM ...
- * await builder.buildMoveAnimation(cards).play(); // после
+ * await builder.buildAnimation(cards).play(); // после
  * ```
  */
 export class AnimationBuilder {
@@ -25,62 +28,58 @@ export class AnimationBuilder {
 		stagger: 0,
 	};
 	readonly #calculator: TrajectoryCalculator;
+	#animationModule: AnimationConstructor = CardMoveAnimation;
 
 	/**
 	 * @param calculator - Реализация TrajectoryCalculator (по умолчанию создаётся автоматически)
 	 */
-	constructor(calculator: TrajectoryCalculator = new TrajectoryCalculator()) {
+	public constructor(calculator: TrajectoryCalculator = new TrajectoryCalculator()) {
 		this.#calculator = calculator;
 	}
 
-	/**
-	 * Устанавливает длительность анимации.
-	 * @param ms - Длительность в миллисекундах
-	 */
-	withDuration(ms: number): this {
+	/** Устанавливает класс анимации, который будет использован при вызове `buildAnimation()`. */
+	public use(module: AnimationConstructor): this {
+		this.#animationModule = module;
+		return this;
+	}
+
+	/** Устанавливает длительность анимации в миллисекундах. */
+	public withDuration(ms: number): this {
 		this.#config.duration = ms;
 		return this;
 	}
 
-	/**
-	 * Устанавливает CSS-функцию плавности.
-	 * @param easing - Например `'ease'`, `'linear'`, `'cubic-bezier(0.4, 0, 0.2, 1)'`
-	 */
-	withEasing(easing: string): this {
+	/** Устанавливает CSS-функцию плавности. */
+	public withEasing(easing: string): this {
 		this.#config.easing = easing;
 		return this;
 	}
 
-	/**
-	 * Устанавливает задержку между анимациями соседних карточек.
-	 * @param ms - Задержка в миллисекундах
-	 */
-	withStagger(ms: number): this {
+	/** Устанавливает задержку между анимациями соседних карточек. */
+	public withStagger(ms: number): this {
 		this.#config.stagger = ms;
 		return this;
 	}
 
-	/**
-	 * Делает снимок позиций карточек до изменения DOM (шаг First).
-	 * @param cards - Карточки, позиции которых нужно запомнить
-	 */
-	snapshot(cards: Iterable<HTMLElement>): this {
+	/** Делает снимок позиций карточек до изменения DOM (шаг First). */
+	public snapshot(cards: Iterable<HTMLElement>): this {
 		this.#calculator.before(cards);
 		return this;
 	}
 
 	/**
-	 * Строит {@link AnimationRunner} с анимациями движения для всех сдвинувшихся карточек.
+	 * Строит {@link AnimationRunner} с анимациями для всех сдвинувшихся карточек.
 	 * Вызывать после изменения DOM.
 	 * @param cards - Те же карточки, что и в `snapshot()`
 	 */
-	buildMoveAnimation(cards: Iterable<HTMLElement>): AnimationRunner {
+	public buildAnimation(cards: Iterable<HTMLElement>): AnimationRunner {
 		const trajectories = this.#calculator.calculate(cards);
 		const runner = new AnimationRunner();
+		const AnimClass = this.#animationModule;
 
 		trajectories.forEach((trajectory, index) => {
 			runner.add(
-				new CardMoveAnimation(trajectory.element, trajectory, {
+				new AnimClass(trajectory.element, trajectory, {
 					...this.#config,
 					delay: index * this.#config.stagger,
 				})

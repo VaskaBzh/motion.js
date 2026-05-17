@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { CardMoveAnimation } from '../CardMoveAnimation.js';
-import type { Trajectory } from '../../types.js';
+import type { Trajectory } from '../../types';
 
 interface AnimationLike {
 	finished: Promise<void>;
