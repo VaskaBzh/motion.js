@@ -4,7 +4,7 @@
 
 ## Обзор
 
-`motion.js` использует **модульную архитектуру библиотеки**: фреймворк-нейтральный `core` и независимые биндинги для каждого фреймворка.
+`@motionlab/motionkit` использует **модульную архитектуру библиотеки**: фреймворк-нейтральный `core` и независимые биндинги для каждого фреймворка.
 
 ```
 src/
@@ -73,8 +73,8 @@ runner.play()
 ### Вариант 1: через use() (без изменения библиотеки)
 
 ```typescript
-import { AnimationBuilder, BaseAnimation } from 'motion.js/core';
-import type { Trajectory, CardMoveOptions } from 'motion.js/core';
+import { AnimationBuilder, BaseAnimation } from '@motionlab/motionkit/core';
+import type { Trajectory, CardMoveOptions } from '@motionlab/motionkit/core';
 
 class CardFadeAnimation extends BaseAnimation {
   readonly #element: HTMLElement;

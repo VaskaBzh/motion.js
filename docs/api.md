@@ -7,7 +7,7 @@
 Главная точка входа. Fluent builder для настройки и запуска FLIP-анимаций.
 
 ```typescript
-import { AnimationBuilder } from 'motion.js/core';
+import { AnimationBuilder } from '@motionlab/motionkit/core';
 ```
 
 ### Конструктор
@@ -54,8 +54,8 @@ await builder.buildAnimation(cards).play();
 `use()` позволяет заменить встроенный `CardMoveAnimation` на любой класс, реализующий `BaseAnimation`:
 
 ```typescript
-import { AnimationBuilder, BaseAnimation } from 'motion.js/core';
-import type { AnimationConstructor, Trajectory, CardMoveOptions } from 'motion.js/core';
+import { AnimationBuilder, BaseAnimation } from '@motionlab/motionkit/core';
+import type { AnimationConstructor, Trajectory, CardMoveOptions } from '@motionlab/motionkit/core';
 
 class CardFadeAnimation extends BaseAnimation {
   readonly #element: HTMLElement;
@@ -95,7 +95,7 @@ await runner.play();
 Оркестратор: запускает набор анимаций параллельно.
 
 ```typescript
-import { AnimationRunner } from 'motion.js/core';
+import { AnimationRunner } from '@motionlab/motionkit/core';
 ```
 
 > Обычно ты не создаёшь `AnimationRunner` напрямую — он возвращается из `builder.buildAnimation()`.
@@ -116,7 +116,7 @@ import { AnimationRunner } from 'motion.js/core';
 Абстрактный базовый класс. Наследуй его для создания собственных анимаций.
 
 ```typescript
-import { BaseAnimation } from 'motion.js/core';
+import { BaseAnimation } from '@motionlab/motionkit/core';
 ```
 
 ### Абстрактные методы
@@ -133,7 +133,7 @@ import { BaseAnimation } from 'motion.js/core';
 Вычисляет смещения карточек по технике FLIP.
 
 ```typescript
-import { TrajectoryCalculator } from 'motion.js/core';
+import { TrajectoryCalculator } from '@motionlab/motionkit/core';
 ```
 
 ### Методы
@@ -152,7 +152,7 @@ import { TrajectoryCalculator } from 'motion.js/core';
 Исполнитель FLIP-анимации для одной карточки через Web Animations API.
 
 ```typescript
-import { CardMoveAnimation } from 'motion.js/core';
+import { CardMoveAnimation } from '@motionlab/motionkit/core';
 ```
 
 ### Конструктор
@@ -173,7 +173,7 @@ new CardMoveAnimation(element: HTMLElement, trajectory: Trajectory, options?: Ca
 ## Vue 3 — useCardAnimation
 
 ```typescript
-import { useCardAnimation } from 'motion.js/vue';
+import { useCardAnimation } from '@motionlab/motionkit/vue';
 ```
 
 ### Сигнатура

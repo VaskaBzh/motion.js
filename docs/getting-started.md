@@ -10,11 +10,11 @@
 ## Установка
 
 ```bash
-npm install motion.js
+npm install @motionlab/motionkit
 # или
-yarn add motion.js
+yarn add @motionlab/motionkit
 # или
-pnpm add motion.js
+pnpm add @motionlab/motionkit
 ```
 
 ## Vanilla TypeScript / JavaScript
@@ -22,7 +22,7 @@ pnpm add motion.js
 Импортируй из core-модуля:
 
 ```typescript
-import { AnimationBuilder } from 'motion.js/core';
+import { AnimationBuilder } from '@motionlab/motionkit/core';
 ```
 
 ### Базовый пример
@@ -62,8 +62,8 @@ await builder.buildAnimation(cards).play();
 ### Со своим классом анимации
 
 ```typescript
-import { AnimationBuilder, BaseAnimation } from 'motion.js/core';
-import type { Trajectory, CardMoveOptions } from 'motion.js/core';
+import { AnimationBuilder, BaseAnimation } from '@motionlab/motionkit/core';
+import type { Trajectory, CardMoveOptions } from '@motionlab/motionkit/core';
 
 class MyAnimation extends BaseAnimation {
   constructor(element: HTMLElement, trajectory: Trajectory, options?: CardMoveOptions) {
@@ -87,7 +87,7 @@ await runner.play();
 Установи тот же пакет и импортируй из Vue-интеграции:
 
 ```typescript
-import { useCardAnimation } from 'motion.js/vue';
+import { useCardAnimation } from '@motionlab/motionkit/vue';
 ```
 
 ### Использование в компоненте
@@ -95,7 +95,7 @@ import { useCardAnimation } from 'motion.js/vue';
 ```vue
 <script setup lang="ts">
 import { nextTick, useTemplateRef } from 'vue';
-import { useCardAnimation } from 'motion.js/vue';
+import { useCardAnimation } from '@motionlab/motionkit/vue';
 
 const cardRefs = useTemplateRef<HTMLElement[]>('cards');
 const { snapshot, animateMove, isAnimating } = useCardAnimation({

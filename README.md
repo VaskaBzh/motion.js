@@ -1,4 +1,4 @@
-# motion.js
+# @motionlab/motionkit
 
 > Плавные FLIP-анимации карточек на TypeScript. Нулевые зависимости.
 
@@ -7,11 +7,11 @@ TypeScript-библиотека для анимации перестановки
 ## Быстрый старт
 
 ```bash
-npm install motion.js
+npm install @motionlab/motionkit
 ```
 
 ```typescript
-import { AnimationBuilder } from 'motion.js/core';
+import { AnimationBuilder } from '@motionlab/motionkit/core';
 
 const builder = new AnimationBuilder()
   .withDuration(350)
@@ -41,7 +41,7 @@ await builder.buildAnimation(cards).play();
 ## Vue 3
 
 ```typescript
-import { useCardAnimation } from 'motion.js/vue';
+import { useCardAnimation } from '@motionlab/motionkit/vue';
 
 const { snapshot, animateMove, isAnimating } = useCardAnimation({
   duration: 350,
