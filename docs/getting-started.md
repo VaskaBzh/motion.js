@@ -42,7 +42,7 @@ builder.snapshot(cards);
 shuffleCards();
 
 // Шаг 3: запусти анимацию ПОСЛЕ изменения DOM
-const runner = builder.buildMoveAnimation(cards);
+const runner = builder.buildAnimation(cards);
 await runner.play();
 ```
 
@@ -56,7 +56,30 @@ const builder = new AnimationBuilder()
 
 builder.snapshot(cards);
 cards.sort(byNewOrder);  // изменяем порядок в DOM
-await builder.buildMoveAnimation(cards).play();
+await builder.buildAnimation(cards).play();
+```
+
+### Со своим классом анимации
+
+```typescript
+import { AnimationBuilder, BaseAnimation } from 'motion.js/core';
+import type { Trajectory, CardMoveOptions } from 'motion.js/core';
+
+class MyAnimation extends BaseAnimation {
+  constructor(element: HTMLElement, trajectory: Trajectory, options?: CardMoveOptions) {
+    super();
+    // ...
+  }
+  override play(): Promise<void> { /* ... */ }
+  override reverse(): Promise<void> { /* ... */ }
+}
+
+const runner = new AnimationBuilder()
+  .use(MyAnimation)
+  .withDuration(400)
+  .buildAnimation(cards);
+
+await runner.play();
 ```
 
 ## Vue 3
@@ -108,15 +131,10 @@ async function onReorder() {
 После запуска анимации карточки должны плавно переместиться на новые позиции. Если движения нет:
 
 1. Убедись, что `snapshot()` вызван **до** изменения DOM
-2. Убедись, что `buildMoveAnimation()` вызван **после** изменения DOM (и после `nextTick()` во Vue)
+2. Убедись, что `buildAnimation()` вызван **после** изменения DOM (и после `nextTick()` во Vue)
 3. Проверь, что карточки действительно сдвинулись (библиотека анимирует только те, у которых `deltaX !== 0 || deltaY !== 0`)
 
 ## Следующие шаги
 
 - [API Reference](api.md) — полная документация по классам и методам
 - [Архитектура](architecture.md) — структура библиотеки и как её расширять
-
-## See Also
-
-- [API Reference](api.md) — все параметры AnimationBuilder
-- [Архитектура](architecture.md) — как добавить новый тип анимации

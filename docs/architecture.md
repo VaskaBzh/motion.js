@@ -20,36 +20,41 @@ src/
 ```
 src/
 ├── core/
-│   ├── index.ts                    # Публичный API: реэкспорт из src/
+│   ├── index.ts                         # Публичный API: реэкспорт из src/
 │   └── src/
-│       ├── types.ts                # Trajectory, CardMoveOptions, BuilderConfig
+│       ├── index.ts                     # Публичный API core
+│       ├── base/
+│       │   └── BaseAnimation.ts         # Абстрактный контракт: play() / reverse()
 │       ├── animations/
-│       │   ├── BaseAnimation.ts    # Абстрактный контракт: play() / reverse()
-│       │   ├── AnimationRunner.ts  # Оркестратор параллельного запуска
-│       │   └── CardMoveAnimation.ts # FLIP через Web Animations API
+│       │   ├── AnimationRunner.ts       # Оркестратор параллельного запуска
+│       │   └── CardMoveAnimation.ts     # FLIP через Web Animations API
 │       ├── builders/
-│       │   └── AnimationBuilder.ts # Fluent builder (точка входа)
-│       └── trajectory/
-│           └── TrajectoryCalculator.ts # FLIP-расчёт: before() → calculate()
+│       │   └── AnimationBuilder.ts      # Fluent builder (точка входа)
+│       ├── calculators/
+│       │   └── TrajectoryCalculator.ts  # FLIP-расчёт: before() → calculate()
+│       └── types/
+│           ├── index.ts                 # Реэкспорт всех типов
+│           ├── animation.ts             # CardMoveOptions, BuilderConfig, AnimationConstructor
+│           └── trajectory.ts            # Trajectory
 └── vue/
-    ├── index.ts                    # Публичный API Vue-биндинга
+    ├── index.ts                         # Публичный API Vue-биндинга
     └── composables/
-        └── useCardAnimation.ts     # Composable с ref(isAnimating)
+        └── useCardAnimation.ts          # Composable с ref(isAnimating)
 ```
 
 ## FLIP pipeline
 
 ```
 builder.snapshot(cards)
-  ↓  TrajectoryCalculator.before(cards)   ← First: запомнить позиции
+  ↓  TrajectoryCalculator.before(cards)     ← First: запомнить позиции
 ──── изменение DOM ────
-builder.buildMoveAnimation(cards)
+builder.buildAnimation(cards)
   ↓  TrajectoryCalculator.calculate(cards)  ← Last + Invert: вычислить дельты
   ↓  для каждой сдвинувшейся карточки:
-  ↓  new CardMoveAnimation(el, trajectory, options)
+  ↓  new AnimationClass(el, trajectory, options)   ← CardMoveAnimation или use()
      AnimationRunner.add(animation)
 runner.play()
-  ↓  CardMoveAnimation.play()             ← Play: Web Animations API
+  ↓  animation.play()                       ← Play: Web Animations API
 ```
 
 ## Правила зависимостей
@@ -68,27 +73,27 @@ runner.play()
 
 ## Добавить новый тип анимации
 
-### 1. Создай класс в `src/core/src/animations/`
+### Вариант 1: через use() (без изменения библиотеки)
 
 ```typescript
-// src/core/src/animations/CardFadeAnimation.ts
-import { BaseAnimation } from './BaseAnimation.js';
+import { AnimationBuilder, BaseAnimation } from 'motion.js/core';
+import type { Trajectory, CardMoveOptions } from 'motion.js/core';
 
-export class CardFadeAnimation extends BaseAnimation {
+class CardFadeAnimation extends BaseAnimation {
   readonly #element: HTMLElement;
   readonly #duration: number;
   #animation: Animation | null = null;
 
-  constructor(element: HTMLElement, duration = 300) {
+  constructor(element: HTMLElement, _trajectory: Trajectory, options: CardMoveOptions = {}) {
     super();
     this.#element = element;
-    this.#duration = duration;
+    this.#duration = options.duration ?? 300;
   }
 
   override play(): Promise<void> {
     this.#animation = this.#element.animate(
       [{ opacity: 0 }, { opacity: 1 }],
-      { duration: this.#duration, fill: 'none' }
+      { duration: this.#duration, fill: 'backwards' }
     );
     return this.#animation.finished.then(() => undefined);
   }
@@ -96,24 +101,44 @@ export class CardFadeAnimation extends BaseAnimation {
   override reverse(): Promise<void> {
     this.#animation = this.#element.animate(
       [{ opacity: 1 }, { opacity: 0 }],
-      { duration: this.#duration, fill: 'none' }
+      { duration: this.#duration }
     );
     return this.#animation.finished.then(() => undefined);
   }
 }
+
+await new AnimationBuilder()
+  .use(CardFadeAnimation)
+  .withDuration(250)
+  .buildAnimation(cards)
+  .play();
 ```
 
-### 2. Экспортируй из `src/core/src/index.ts`
+### Вариант 2: новый класс внутри библиотеки
+
+#### 1. Создай класс в `src/core/src/animations/`
 
 ```typescript
-export { CardFadeAnimation } from './animations/CardFadeAnimation.js';
+// src/core/src/animations/CardFadeAnimation.ts
+import { BaseAnimation } from '../base/BaseAnimation.ts';
+import type { Trajectory, CardMoveOptions } from '../types';
+
+export class CardFadeAnimation extends BaseAnimation {
+  // ...реализация как выше
+}
 ```
 
-### 3. Используй через AnimationRunner
+#### 2. Экспортируй из `src/core/src/index.ts`
+
+```typescript
+export { CardFadeAnimation } from './animations/CardFadeAnimation.ts';
+```
+
+#### 3. Используй напрямую через AnimationRunner
 
 ```typescript
 const runner = new AnimationRunner();
-cards.forEach(el => runner.add(new CardFadeAnimation(el, 250)));
+cards.forEach(el => runner.add(new CardFadeAnimation(el, { element: el, deltaX: 0, deltaY: 0 })));
 await runner.play();
 ```
 
@@ -129,7 +154,7 @@ src/react/
 ```typescript
 // src/react/hooks/useCardAnimation.ts
 import { useRef, useState, useCallback } from 'react';
-import { AnimationBuilder } from '../../core/src/index.js'; // ← только core
+import { AnimationBuilder } from '../../core/src';  // ← только core
 
 export function useCardAnimation(options = {}) {
   const builderRef = useRef(new AnimationBuilder());
@@ -142,7 +167,7 @@ export function useCardAnimation(options = {}) {
   const animateMove = useCallback(async (cards) => {
     setIsAnimating(true);
     try {
-      await builderRef.current.buildMoveAnimation(cards).play();
+      await builderRef.current.buildAnimation(cards).play();
     } finally {
       setIsAnimating(false);
     }
@@ -156,11 +181,12 @@ export function useCardAnimation(options = {}) {
 
 | Соглашение | Правило |
 |-----------|---------|
-| Импорты | Всегда с `.js` расширением (ESM-only) |
+| Импорты файлов | С расширением `.ts` (ESM-only) |
+| Импорты директорий | Путь к папке без `index.ts` (`'../types'`, не `'../types/index.ts'`) |
 | Приватные поля | Нативные `#field`, не TypeScript `private` |
 | Fluent методы | Возвращают `this` |
 | Переопределение | Ключевое слово `override` обязательно |
-| Новые анимации | Наследуют `BaseAnimation` |
+| Новые анимации | Наследуют `BaseAnimation` из `base/` |
 
 ## See Also
 

@@ -25,7 +25,7 @@ builder.snapshot(cards);
 reorderCards();
 
 // После изменения DOM — запускаем анимацию
-await builder.buildMoveAnimation(cards).play();
+await builder.buildAnimation(cards).play();
 ```
 
 ## Ключевые возможности
@@ -34,6 +34,7 @@ await builder.buildMoveAnimation(cards).play();
 - **Web Animations API** — нативный браузерный API, никаких зависимостей
 - **Fluent builder** — читаемый DSL для настройки анимаций
 - **Stagger** — волновой эффект задержек между карточками
+- **Plugin API** — подключи свой класс анимации через `.use()`
 - **Vue 3** — готовый composable `useCardAnimation`
 - **TypeScript** — полная типизация из коробки
 

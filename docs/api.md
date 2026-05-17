@@ -24,6 +24,7 @@ new AnimationBuilder(calculator?: TrajectoryCalculator)
 
 | Метод | Возвращает | Описание |
 |-------|-----------|---------|
+| `use(module: AnimationConstructor)` | `this` | Подключает пользовательский класс анимации (по умолчанию `CardMoveAnimation`) |
 | `withDuration(ms: number)` | `this` | Длительность анимации в мс (по умолчанию 300) |
 | `withEasing(easing: string)` | `this` | CSS-функция плавности (по умолчанию `'ease'`) |
 | `withStagger(ms: number)` | `this` | Задержка между соседними карточками в мс (по умолчанию 0) |
@@ -33,7 +34,7 @@ new AnimationBuilder(calculator?: TrajectoryCalculator)
 | Метод | Возвращает | Описание |
 |-------|-----------|---------|
 | `snapshot(cards: Iterable<HTMLElement>)` | `this` | Запоминает позиции карточек **до** изменения DOM |
-| `buildMoveAnimation(cards: Iterable<HTMLElement>)` | `AnimationRunner` | Строит runner с FLIP-анимациями **после** изменения DOM |
+| `buildAnimation(cards: Iterable<HTMLElement>)` | `AnimationRunner` | Строит runner с FLIP-анимациями **после** изменения DOM |
 
 ### Пример
 
@@ -45,7 +46,46 @@ const builder = new AnimationBuilder()
 
 builder.snapshot(cards);
 reorder();
-await builder.buildMoveAnimation(cards).play();
+await builder.buildAnimation(cards).play();
+```
+
+### Plugin API — use()
+
+`use()` позволяет заменить встроенный `CardMoveAnimation` на любой класс, реализующий `BaseAnimation`:
+
+```typescript
+import { AnimationBuilder, BaseAnimation } from 'motion.js/core';
+import type { AnimationConstructor, Trajectory, CardMoveOptions } from 'motion.js/core';
+
+class CardFadeAnimation extends BaseAnimation {
+  readonly #element: HTMLElement;
+  readonly #duration: number;
+
+  constructor(element: HTMLElement, _trajectory: Trajectory, options: CardMoveOptions = {}) {
+    super();
+    this.#element = element;
+    this.#duration = options.duration ?? 300;
+  }
+
+  override play(): Promise<void> {
+    return this.#element
+      .animate([{ opacity: 0 }, { opacity: 1 }], { duration: this.#duration, fill: 'backwards' })
+      .finished.then(() => undefined);
+  }
+
+  override reverse(): Promise<void> {
+    return this.#element
+      .animate([{ opacity: 1 }, { opacity: 0 }], { duration: this.#duration })
+      .finished.then(() => undefined);
+  }
+}
+
+const runner = new AnimationBuilder()
+  .use(CardFadeAnimation)
+  .withDuration(250)
+  .buildAnimation(cards);
+
+await runner.play();
 ```
 
 ---
@@ -58,7 +98,7 @@ await builder.buildMoveAnimation(cards).play();
 import { AnimationRunner } from 'motion.js/core';
 ```
 
-> Обычно ты не создаёшь `AnimationRunner` напрямую — он возвращается из `builder.buildMoveAnimation()`.
+> Обычно ты не создаёшь `AnimationRunner` напрямую — он возвращается из `builder.buildAnimation()`.
 
 ### Методы
 
@@ -68,6 +108,23 @@ import { AnimationRunner } from 'motion.js/core';
 | `play()` | `Promise<void>` | Запускает все анимации параллельно |
 | `reverse()` | `Promise<void>` | Воспроизводит все анимации в обратном порядке |
 | `clear()` | `this` | Очищает список анимаций |
+
+---
+
+## BaseAnimation
+
+Абстрактный базовый класс. Наследуй его для создания собственных анимаций.
+
+```typescript
+import { BaseAnimation } from 'motion.js/core';
+```
+
+### Абстрактные методы
+
+| Метод | Возвращает | Описание |
+|-------|-----------|---------|
+| `play()` | `Promise<void>` | Воспроизведение анимации |
+| `reverse()` | `Promise<void>` | Обратное воспроизведение |
 
 ---
 
@@ -166,6 +223,11 @@ interface BuilderConfig {
   duration: number;
   easing: string;
   stagger: number;  // задержка между соседними карточками
+}
+
+/** Конструктор пользовательского класса анимации для use(). */
+interface AnimationConstructor {
+  new(element: HTMLElement, trajectory: Trajectory, options?: CardMoveOptions): BaseAnimation;
 }
 ```
 

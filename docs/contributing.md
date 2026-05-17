@@ -6,7 +6,7 @@
 
 ### Требования
 
-- Node.js 20+
+- Node.js 22+
 - npm 10+
 
 ### Установка зависимостей
@@ -20,10 +20,12 @@ npm install
 | Команда | Описание |
 |---------|---------|
 | `npm run dev` | Запускает dev-сервер Vite (для sandbox/demo) |
-| `npm run build` | Сборка: `tsc && vite build` |
+| `npm run build` | Сборка библиотеки в `dist/` |
 | `npm run preview` | Предпросмотр собранного приложения |
 | `npm run lint` | ESLint проверка `src/` |
 | `npm run typecheck` | TypeScript проверка без emit (`tsc --noEmit`) |
+| `npm test` | Запускает все unit-тесты (Vitest) |
+| `npm run test:coverage` | Тесты с отчётом о покрытии |
 
 ## Структура проекта
 
@@ -31,15 +33,16 @@ npm install
 
 Ключевые правила:
 - `src/core/` — только Web APIs, никаких фреймворк-импортов
-- Импорты с расширением `.js` (даже для `.ts` файлов)
+- Импорты файлов с расширением `.ts` (не `.js`)
+- При импорте из директории — только путь к папке (`'../types'`, не `'../types/index.ts'`)
 - Нативные `#` private fields (не TypeScript `private`)
 - `override` ключевое слово при переопределении методов
 
 ## Добавление фич
 
-1. **Новый тип анимации** → создай в `src/core/src/animations/`, наследуй `BaseAnimation`
+1. **Новый тип анимации** → создай в `src/core/src/animations/`, наследуй `BaseAnimation` из `base/`
 2. **Новый фреймворк-биндинг** → создай `src/<framework>/`, импортируй только из `core/`
-3. **Изменение builder API** → обнови `AnimationBuilder.ts` и типы в `types.ts`
+3. **Изменение builder API** → обнови `AnimationBuilder.ts` и типы в `types/`
 
 ## TypeScript
 
@@ -65,13 +68,25 @@ npm run lint
 
 ## Тестирование
 
-Планируется Vitest для unit-тестов. Структура тестов:
+Проект использует [Vitest](https://vitest.dev/). Тесты расположены рядом с исходниками:
 
 ```
 src/
-├── core/src/animations/__tests__/
-├── core/src/builders/__tests__/
-└── vue/composables/__tests__/
+├── core/src/animations/__tests__/AnimationRunner.test.ts
+├── core/src/builders/__tests__/AnimationBuilder.test.ts
+├── core/src/calculators/__tests__/TrajectoryCalculator.test.ts
+└── vue/composables/__tests__/useCardAnimation.test.ts
+```
+
+```bash
+# Запустить все тесты
+npm test
+
+# Запустить с покрытием
+npm run test:coverage
+
+# Watch-режим при разработке
+npm run test:watch
 ```
 
 ## See Also
