@@ -9,8 +9,7 @@
 ```
 src/
 ├── core/   ← Web APIs только, нулевые зависимости
-├── vue/    ← зависит от core + vue
-└── react/  ← зависит от core + react (планируется)
+└── vue/    ← зависит от core + vue
 ```
 
 Зависимости всегда направлены к `core`. Биндинги не зависят друг от друга.
@@ -62,14 +61,12 @@ runner.play()
 ```
           core/
          (только Web APIs)
-          ↑          ↑
-        vue/       react/
+              ↑
+            vue/
 ```
 
 - ✅ `vue/` → `core/`
-- ✅ `react/` → `core/`
-- ❌ `core/` → `vue/` или `react/`
-- ❌ `vue/` → `react/`
+- ❌ `core/` → `vue/`
 
 ## Добавить новый тип анимации
 
@@ -140,41 +137,6 @@ export { CardFadeAnimation } from './animations/CardFadeAnimation.ts';
 const runner = new AnimationRunner();
 cards.forEach(el => runner.add(new CardFadeAnimation(el, { element: el, deltaX: 0, deltaY: 0 })));
 await runner.play();
-```
-
-## Добавить новый фреймворк-биндинг (React)
-
-```
-src/react/
-├── index.ts
-└── hooks/
-    └── useCardAnimation.ts
-```
-
-```typescript
-// src/react/hooks/useCardAnimation.ts
-import { useRef, useState, useCallback } from 'react';
-import { AnimationBuilder } from '../../core/src';  // ← только core
-
-export function useCardAnimation(options = {}) {
-  const builderRef = useRef(new AnimationBuilder());
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  const snapshot = useCallback((cards) => {
-    builderRef.current.snapshot(cards);
-  }, []);
-
-  const animateMove = useCallback(async (cards) => {
-    setIsAnimating(true);
-    try {
-      await builderRef.current.buildAnimation(cards).play();
-    } finally {
-      setIsAnimating(false);
-    }
-  }, []);
-
-  return { snapshot, animateMove, isAnimating };
-}
 ```
 
 ## Ключевые соглашения

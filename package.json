@@ -1,7 +1,7 @@
 {
   "name": "motion.js",
   "version": "0.1.0",
-  "description": "FLIP card animations library for TypeScript, Vue 3, and React",
+  "description": "FLIP card animations library for TypeScript and Vue 3",
   "type": "module",
   "files": [
     "dist"
