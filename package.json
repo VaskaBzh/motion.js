@@ -1,7 +1,21 @@
 {
   "name": "@motionlab/motionkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "FLIP card animations library for TypeScript and Vue 3",
+  "keywords": [
+    "animation",
+    "flip",
+    "motion",
+    "vue",
+    "typescript",
+    "web-animations",
+    "cards"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VaskaBzh/motionkit.git"
+  },
+  "homepage": "https://github.com/VaskaBzh/motionkit#readme",
   "type": "module",
   "files": [
     "dist"
