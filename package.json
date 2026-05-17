@@ -1,0 +1,59 @@
+{
+  "name": "motion.js",
+  "version": "0.1.0",
+  "description": "FLIP card animations library for TypeScript, Vue 3, and React",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs",
+      "types": "./dist/core/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs",
+      "types": "./dist/core/index.d.ts"
+    },
+    "./vue": {
+      "import": "./dist/vue.js",
+      "require": "./dist/vue.cjs",
+      "types": "./dist/vue/index.d.ts"
+    }
+  },
+  "main": "./dist/core.cjs",
+  "module": "./dist/core.js",
+  "types": "./dist/core/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.6",
+    "eslint": "^10.4.0",
+    "happy-dom": "^20.9.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.3",
+    "vite": "^8.0.12",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.6",
+    "vue": "^3.5.34"
+  }
+}
