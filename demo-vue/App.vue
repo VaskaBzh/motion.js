@@ -1,7 +1,7 @@
 <template>
   <div class="demo-layout">
     <header class="demo-header">
-      <h1>motion<span>.js</span> Vue demo</h1>
+      <h1><a href="./index.html">motion<span>.js</span></a> Vue demo</h1>
       <nav class="tabs">
         <button
           :class="['tab-btn', { 'tab-btn--active': tab === 'shuffle' }]"

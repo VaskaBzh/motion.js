@@ -11,7 +11,7 @@ export default function App(): JSX.Element {
 	return (
 		<div className="demo-layout">
 			<header className="demo-header">
-				<h1>motion<span>.js</span> React demo</h1>
+				<h1><a href="./index.html">motion<span>.js</span></a> React demo</h1>
 				<nav className="tabs">
 					<button
 						className={`tab-btn${tab === 'shuffle' ? ' tab-btn--active' : ''}`}
